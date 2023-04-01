@@ -1,5 +1,8 @@
 #!/bin/bash
-
+#
+# USE WITH: ./forward.sh address wanport lanport to add rule
+# USE WITH: ./forward.sh -r address wanport lanport to remove rule
+#
 # decide which action to use
 action="add"
 if [[ "-r" == "$1" ]]; then
@@ -8,9 +11,9 @@ if [[ "-r" == "$1" ]]; then
 fi
 
 # break out components
-dest_addr_lan="10.10.10.10"
-dest_port_wan="443"
-dest_port_lan="443"
+dest_addr_lan="$1"
+dest_port_wan="$2"
+dest_port_lan="$3"
 
 # figure out our WAN ip
 wan_addr=`curl -4 -s icanhazip.com`
@@ -44,3 +47,8 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 else
   echo "Info not confirmed, exiting..."
 fi
+
+iptables-save > iptables.rules
+echo "#!/bin/bash" > /etc/init.d/iptables.sh
+cat iptables.rules >> /etc/init.d/iptables.sh
+exit 0
